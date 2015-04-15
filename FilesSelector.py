@@ -13,6 +13,7 @@ def get_files_from(dir):
 			files_list.append(file)
 	return files_list
 
+
 # Select a bunch of random files
 def select_random_files(files_list, percent):
 	return random.sample(files_list, int(len(files_list) / 100 * percent))
@@ -21,3 +22,9 @@ def select_random_files(files_list, percent):
 def get_random_files_from(dir, percent):
 	files_list = get_files_from(dir)
 	return select_random_files(files_list, percent)
+
+
+if __name__ == '__main__':
+	truc = get_random_files_from('neg', 20)
+	print(truc)
+	print(len(truc))
