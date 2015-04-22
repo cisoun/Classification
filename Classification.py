@@ -17,8 +17,10 @@ class Classification:
 		self.dict_global_word_count = dict()
 		self.dict_global_prob = dict()
 
-		self.classificateList(self.listDocPos, 0)
-		self.classificateList(self.listDocNeg, 1)
+		index_pos = 0
+		index_neg = 1
+		self.classificateList(self.listDocPos, index_pos)
+		self.classificateList(self.listDocNeg, index_neg)
 
 	def classificate(self, document):
 		probPos = 0
@@ -47,11 +49,11 @@ class Classification:
 		
 		for word, occurence in self.dict_global_word_count.items():
 			try:
-				self.dict_global_prob[word][index] = (occurence + 1) / (len(self.dict_global_word_count))
+				self.dict_global_prob[word][index] = (occurence + 1) / (len(self.dict_global_word_count)) #TODO: add number of positive words
 			except KeyError:
 				self.dict_global_prob[word] = [0, 0]
-				self.dict_global_prob[word][index] = (occurence + 1)/ (len(self.dict_global_word_count))
-			
+				self.dict_global_prob[word][index] = (occurence + 1)/ (len(self.dict_global_word_count)) #TODO: add number of negative words
+
 
 if __name__ == '__main__':
 
@@ -67,16 +69,16 @@ if __name__ == '__main__':
 
 	classification = Classification(list_doc_pos, list_doc_neg)
 
+	# Test corpus
 	list_test_pos.extend(list_test_neg)
-
 	corpus = list_test_pos
-
 	total_document = len(corpus)
 	correctly_analysed_doc = 0
 
 	for document in corpus:
-		resultOK = classification.classificate(document)
-		if resultOK:
+		is_result_OK = classification.classificate(document)
+		if is_result_OK:
 			correctly_analysed_doc += 1
 
-	print("accuracy:", (correctly_analysed_doc/total_document)*100)
+	accuracy = (correctly_analysed_doc/total_document)*100
+	print("accuracy:",accuracy)
