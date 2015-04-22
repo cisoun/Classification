@@ -1,38 +1,82 @@
+# -*- encoding: utf-8 -*-
+
 from Document import Document
-from FilesSelector import get_random_files_from
+from FilesSelector import get_tupled_files
+import math
+
+
+def checkResult(document, result):
+	return result in document.filename
+
 
 class Classification:
 	"""docstring for Classification"""
 	def __init__(self, listDocPos, listDocNeg):
 		self.listDocPos = listDocPos
 		self.listDocNeg = listDocNeg
-		self.dictGlobalWordCount = dict()
-		self.dictGlobalProb = dict()
+		self.dict_global_word_count = dict()
+		self.dict_global_prob = dict()
 
-	def classificate(self, document):
 		self.classificateList(self.listDocPos, 0)
 		self.classificateList(self.listDocNeg, 1)
+
+	def classificate(self, document):
+		probPos = 0
+		probNeg = 0
+		result = "undefined"
+
+		for word, occurence in document.dictionary.items():
+			try:
+				probPos += math.log(self.dict_global_prob[word][0])
+				probNeg += math.log(self.dict_global_prob[word][1])
+			except Exception:
+				pass
+
+		if(probPos > probNeg):
+			result = "pos"
+		else:
+			result = "neg"
+
+		return checkResult(document, result)
 
 
 	def classificateList(self, listDoc, index):
 		for doc in listDoc:
-			for k, v in doc.dictionary.items():
-				self.dictGlobalWordCount[k] = self.dictGlobalWordCount.get(k, 0) + v
+			for word, occurence in doc.dictionary.items():
+				self.dict_global_word_count[word] = self.dict_global_word_count.get(word, 0) + occurence
 		
-		for k, v in self.dictGlobalWordCount.items():
+		for word, occurence in self.dict_global_word_count.items():
 			try:
-				self.dictGlobalProb[k][index] = v / len(self.dictGlobalWordCount)
+				self.dict_global_prob[word][index] = (occurence + 1) / (len(self.dict_global_word_count))
 			except KeyError:
-				self.dictGlobalProb[k] = [0, 0]
-				self.dictGlobalProb[k][index] = v / len(self.dictGlobalWordCount)
+				self.dict_global_prob[word] = [0, 0]
+				self.dict_global_prob[word][index] = (occurence + 1)/ (len(self.dict_global_word_count))
 			
 
 if __name__ == '__main__':
-	listDocPos = [Document("pos/" + doc) for doc in get_random_files_from("pos", 0.1)]
-	listDocNeg = [Document("neg/" + doc) for doc in get_random_files_from("neg", 0.1)]
 
-	document = Document("pos/pos-0666.txt")
-	classification = Classification(listDocPos, listDocNeg)
-	classification.classificate(document)
+	positive_slicing = 80
+	list_learning_pos, list_test_pos = get_tupled_files("pos", positive_slicing)
+	list_learning_neg, list_test_neg = get_tupled_files("neg", positive_slicing)
 
-	print(classification.dictGlobalProb),
+	list_doc_pos = [Document("pos/" + doc) for doc in list_learning_pos]
+	list_doc_neg = [Document("neg/" + doc) for doc in list_learning_neg]
+
+	list_test_pos = [Document("pos/" + doc) for doc in list_test_pos]
+	list_test_neg = [Document("neg/" + doc) for doc in list_test_neg]
+
+	classification = Classification(list_doc_pos, list_doc_neg)
+
+	list_test_pos.extend(list_test_neg)
+
+	corpus = list_test_pos
+
+	total_document = len(corpus)
+	correctly_analysed_doc = 0
+
+	for document in corpus:
+		resultOK = classification.classificate(document)
+		if resultOK:
+			correctly_analysed_doc += 1
+
+	print("accuracy:", (correctly_analysed_doc/total_document)*100)

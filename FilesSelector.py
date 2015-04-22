@@ -24,6 +24,13 @@ def get_random_files_from(dir, percent):
 	return select_random_files(files_list, percent)
 
 
+def get_tupled_files(dir, percent):
+	files = get_files_from(dir)
+	index = int(len(files) * (percent/100))
+	random.shuffle(files)
+	return files[:index], files[index:]
+
+
 if __name__ == '__main__':
 	truc = get_random_files_from('neg', 20)
 	print(truc)
