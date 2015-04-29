@@ -57,28 +57,38 @@ class Classification:
 
 if __name__ == '__main__':
 
-	positive_slicing = 80
-	list_learning_pos, list_test_pos = get_tupled_files("pos", positive_slicing)
-	list_learning_neg, list_test_neg = get_tupled_files("neg", positive_slicing)
+	i = 0
+	n = 10
+	avg = 0
+	print("**** TEST with", n ,"runs  ****")
+	while i < n:
+		positive_slicing = 80
+		list_learning_pos, list_test_pos = get_tupled_files("pos", positive_slicing)
+		list_learning_neg, list_test_neg = get_tupled_files("neg", positive_slicing)
 
-	list_doc_pos = [Document("pos/" + doc) for doc in list_learning_pos]
-	list_doc_neg = [Document("neg/" + doc) for doc in list_learning_neg]
+		list_doc_pos = [Document("pos/" + doc) for doc in list_learning_pos]
+		list_doc_neg = [Document("neg/" + doc) for doc in list_learning_neg]
 
-	list_test_pos = [Document("pos/" + doc) for doc in list_test_pos]
-	list_test_neg = [Document("neg/" + doc) for doc in list_test_neg]
+		list_test_pos = [Document("pos/" + doc) for doc in list_test_pos]
+		list_test_neg = [Document("neg/" + doc) for doc in list_test_neg]
 
-	classification = Classification(list_doc_pos, list_doc_neg)
+		classification = Classification(list_doc_pos, list_doc_neg)
 
-	# Test corpus
-	list_test_pos.extend(list_test_neg)
-	corpus = list_test_pos
-	total_document = len(corpus)
-	correctly_analysed_doc = 0
+		# Test corpus
+		list_test_pos.extend(list_test_neg)
+		corpus = list_test_pos
+		total_document = len(corpus)
+		correctly_analysed_doc = 0
 
-	for document in corpus:
-		is_result_OK = classification.classificate(document)
-		if is_result_OK:
-			correctly_analysed_doc += 1
+		for document in corpus:
+			is_result_OK = classification.classificate(document)
+			if is_result_OK:
+				correctly_analysed_doc += 1
 
-	accuracy = (correctly_analysed_doc/total_document)*100
-	print("accuracy:",accuracy)
+		accuracy = (correctly_analysed_doc/total_document)*100
+		print("accuracy:",accuracy)
+
+		avg += accuracy
+		i+=1
+	avg /= n
+	print("**** avg:", avg, " ****")
