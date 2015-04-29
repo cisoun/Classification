@@ -1,27 +1,17 @@
 # -*- coding: utf8 -*-
 
 import re
+from UselessWords import useless_words
 
 class Document:
 	"""docstring for Document"""
 	def __init__(self, filename):
 		self.filename = filename
-		self.useless_words = self.load_useless_words()
+		self.useless_words = useless_words
 		self.dictionary = self.word_counter(filename)
 		
 	def __repr__(self):
 		return self.filename
-
-	def load_useless_words(self):
-		"""
-		Get in a list all useless words provided by frenchST.txt such as "le", "mes", "aussi",...
-		:return: a list with all the useless words in the file
-		"""
-		words = []
-		with open("frenchST.txt", encoding="utf-8", mode="r") as file:
-			for lines in file:
-				words.append(lines.rstrip("\n\r"))
-		return words
 
 	def word_counter(self, filename):
 		dict_words = dict()
@@ -35,6 +25,7 @@ class Document:
 					But it doesn't work very well... So we drop it
 					'''
 					# words = re.findall(r'\w+', word, re.UNICODE)
+					# for word in words....add to dict_word...
 					# print(words)
 
 					if len(word) >= 3 and not (word in self.useless_words):
